@@ -1,0 +1,24 @@
+---
+:enabled: true
+
+# Ruby regular expression pattern to include
+#:pattern: (ERR|Error|error|FATAL|fatal|Exception)
+
+# Polling interval (defaults to 1 second)
+#:poll: 1
+
+# List of monitored files as pairs [identificator, file].
+# This does not accept shell globs, only valid and existing
+# file names are accepted.
+#:files:
+#- [sys, /var/log/messages]
+
+# Other example files (relevant for Katello plugin):
+#- [sys, /var/log/messages]
+#- [httpd, /var/log/httpd/error_log
+#- [httpd, /var/log/httpd/foreman_error.log
+#- [httpd, /var/log/httpd/foreman-ssl_error_ssl.log
+#- [puppet, /var/log/puppet/masterhttp.log
+#- [cpin, /var/log/candlepin/candlepin.log
+#- [cpin, /var/log/candlepin/error.log
+#- [cpin, /var/log/tomcat/catalina.out

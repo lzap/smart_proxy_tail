@@ -1,0 +1,5 @@
+.idea
+smart_proxy_tail*gem
+logs
+Gemfile.lock
+bin/generate-fake-logs

@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+module Proxy; end
+require "logger"
+require "smart_proxy_tail/runner"
+
+logger = ::Logger.new(STDOUT)
+logger.level = Logger::DEBUG
+pattern = ARGV.shift
+files = ARGV.each_slice(2)
+runner = Proxy::Tail::Runner.new(pattern, files, logger, 1)
+runner.start
+runner.join
