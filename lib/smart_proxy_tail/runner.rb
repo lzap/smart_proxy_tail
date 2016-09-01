@@ -1,6 +1,7 @@
+require 'smart_proxy_tail/watched_file'
+
 module Proxy::Tail
   class Runner
-
     def initialize(pattern, files, logger, poll_sleep)
       @pattern = pattern
       @files = files
@@ -10,24 +11,20 @@ module Proxy::Tail
 
     def start
       @thread = Thread.new(@pattern, @files, @logger, @poll_sleep) do |pattern, files, logger, poll_sleep|
-        handles = {}
+        watched_files = []
         pattern = Regexp.new(pattern)
         begin
           logger.debug "Started tail thread with " + files.collect{ |x| x[1]}.join(', ')
           files.each do |file_pair|
-            fileid, filename = file_pair
-            if File.exist?(filename)
-              f = File.open(filename, "r")
-              f.seek(0, IO::SEEK_END)
-              handles[f] = fileid
-            else
-              logger.warn "Ignoring missing tail-file '#{filename}'"
-            end
+            file = WatchedFile.new(*file_pair)
+            file.reopen
+            watched_files << file
           end
           while true do
-            handles.each do |f, id|
-              while line = f.gets(2000) do
-                logger.error "[#{id}] #{line.chomp}" if line =~ pattern
+            watched_files.each do |file|
+              file.check_inode
+              while line = file.bulk_read do
+                logger.error "[#{file.id}] #{line.chomp}" if line =~ pattern
               end
             end
             sleep poll_sleep
@@ -37,7 +34,7 @@ module Proxy::Tail
           logger.debug e.backtrace.join("\n")
           logger.warn "File tail plugin is now disabled"
         ensure
-          handles.keys.each { |h| h.close if h }
+          watched_files.each(&:close)
         end
       end
     end
